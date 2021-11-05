@@ -1,6 +1,4 @@
-from time import sleep
 import threading
-import socket
 from utility.sendreceive import send, receive, DISCONNECT_MESSAGE
 import sys
 import socket
@@ -12,9 +10,9 @@ def is_encode(client: socket):
     is_encrypt: bool
     _ = input()
     if _ == 'y':
-        is_encrypt = 1
+        is_encrypt = True
     else:
-        is_encrypt = 0
+        is_encrypt = False
     send(client, _)
     # temp = receive(client)
     # print(temp)
@@ -71,7 +69,7 @@ def read(client: socket, is_encrypt: bool, prompt: list):
                     prompt.append((words[1], words[3]))
             else:
                 print(f"{msg}")
-        except Exception as err:
+        except (Exception,):
             # print(str(err))
             # if input("Server is down. Exit (y/n)?") != 'n':
             #     #print("Connection closed!")
@@ -86,10 +84,9 @@ def start(client: socket):
     print(temp)
 
     # encrypt or not
-    is_encrypt: bool = 0
     try:
         is_encrypt = is_encode(client)
-    except:
+    except (Exception,):
         print("Error getting encode information. Server is busy!")
         return
 
@@ -101,14 +98,13 @@ def start(client: socket):
     read_thread = threading.Thread(target=read, args=(client, is_encrypt, prompt))
     read_thread.start()
 
-    sender = ""
     while True:
         try:
             s = input(">>")
             if s == "open":
                 try:
                     s = open_file()
-                except:
+                except (Exception,):
                     print("Invalid file")
                     continue
 
@@ -147,7 +143,7 @@ def start(client: socket):
 
             if s == DISCONNECT_MESSAGE:
                 break
-        except:
+        except (Exception,):
             if input("Server is down. Exit (y/n)?") != 'n':
                 # os.system('cls')
                 break
@@ -165,18 +161,18 @@ def connect(server: str = "", port: int = 0):
                 port = int(input("Enter server's port number: "))
             conn.connect((server, port))
 
-        except:
+        except (Exception,):
             print("Cannot connect. Invalid ip/port address")
-            if (input("Continue? (y/n): ") == 'n'):
+            if input("Continue? (y/n): ") == 'n':
                 break
 
         try:
-            msg = input("Enter a short message for client to regconize you: ")
-            if (msg):
+            msg = input("Enter a short message for client to recognize you: ")
+            if msg:
                 send(conn, msg)
             else:
                 send(conn, "None")
-        except:
+        except (Exception,):
             print("Server is down upon welcoming!")
             conn.close()
             if input("Continue? (y/n): ") == 'n':
@@ -194,7 +190,7 @@ def connect(server: str = "", port: int = 0):
                 print(response)
 
                 return conn
-        except:
+        except (Exception,):
             print("Server doesnt response!")
             if input("Continue? (y/n): ") == 'n':
                 break
@@ -237,10 +233,10 @@ if __name__ == "__main__":
         try:
             print("Waiting for response...\n")
             print(receive(client, is_encrypt))
-        except:
+        except (Exception,):
             if input("Continue to server (y/n)?") == 'n':
                 break
-        # except:
+        # except (Exception,):
         #     print("Error. Server is busy!")
         #     if ((input("Continue? (y/n): ")) != 'y'):
         #         break
@@ -254,7 +250,7 @@ def write(client:socket, is_encrypt:bool, prompt:list, is_end:list):
             try:
                 file = open_file(s[5:])
                 s = input("msg: ")
-            except:
+            except (Exception,):
                 print("Invalid file")
                 continue
         
@@ -289,7 +285,7 @@ def read(client:socket, is_encrypt:bool, prompt:list, is_end:list):
             else:
                 print(f"Receiving: {msg}")
             #sleep(7)
-        except Exception as err:
+        except (Exception,) except (Exception,)ion as err:
             #print(str(err))
             if input("Server is down. Exit (y/n)?") != 'n':
                 print("Connection closed!")

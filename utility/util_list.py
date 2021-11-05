@@ -13,7 +13,7 @@ class Client:
         self.fullname = fullname
         self.dob = dob
         self.note = note
-        self.game = [] # game, players, score
+        self.game = []  # game, players, score
         self.battleship = BattleShip()
 
     def add_game(self, game, players: list, score: int):

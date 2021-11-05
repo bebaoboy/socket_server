@@ -83,9 +83,10 @@ def create_ship_list(name, ships):
     lines = ships.split('\n')
     for line in lines:
         word = line.split()
-        ship_list.append(Ship(int(word[0]), int(word[1]), int(word[2]), int(word[3])))
+        ship_list.append(Ship(int(word[0]), int(word[1]), int(word[2]) + 1, int(word[3]) + 1))
 
     client_list[name][2].battleship.ship = ship_list
+    client_list[name][2].battleship.num_of_ship = len(ship_list)
 
 
 def upload_ship(connection, name, other_name, msg, is_encrypt, activity_list, flag):
@@ -190,26 +191,32 @@ def hit_or_miss(x, y, name: str):
 
 
 def is_lose(name):
-    return len(client_list[name][2].battleship.ship) == 0
+    return client_list[name][2].battleship.num_of_ship == 0
 
 
 def attack_ship(connection, name, other_name, msg: str, is_encrypt, activity_list, flag):
-    if msg[:8] != "forward ":
-        if is_lose(other_name):  # you win
-            pass
+    if msg[:8] != "forward ":  # you attack
         if msg == QUIT:
             activity_list[BATTLESHIP] = 0
             flag.clear()
             send(connection, "You quit the game", is_encrypt)
             send(client_list[other_name][0], f"{name} quits the game. You win!", client_list[other_name][4])
-            client_list[other_name][2].game_list.append((BATTLESHIP, name, -1))
+            client_list[other_name][2].game.append((BATTLESHIP, name, -1))
             client_list[other_name][2].battleship.score = -1
-            client_list[name][2].game_list.append((BATTLESHIP, other_name, -1))
+            client_list[name][2].game.append((BATTLESHIP, other_name, -1))
             client_list[name][2].battleship.score = -1
         else:
             word = msg.split()
-            if not client_list[other_name][2].battleship.board[word[0]][word[1]] == '.':  # I already shot
-                pass
+            if (client_list[other_name][2].battleship.board[word[0]][word[1]] == '.') \
+                    or (int(word[0]) < 1 or int(word[0]) > BOARD_SIZE - 1) \
+                    or (int(word[1]) < 1 or int(word[1]) > BOARD_SIZE - 1):  # I already shot
+                send(connection, "Invalid coordinates", is_encrypt)
+                return
+            if is_lose(other_name):  # you win
+                client_list[other_name][2].game_list.append(
+                    (BATTLESHIP, name, client_list[other_name][2].battleship.score))
+                client_list[name][2].game_list.append((BATTLESHIP, other_name, client_list[name][2].battleship.score))
+
             if hit_or_miss(word[0], word[1], other_name):
                 send(connection, f"Hit. One ship down. {show_remaining_ship(other_name)}Attack (x,y):")
                 forward_no_reply(name, other_name, f"{name} shot your ship at ({word[0], word[1]} \
@@ -219,9 +226,7 @@ def attack_ship(connection, name, other_name, msg: str, is_encrypt, activity_lis
                 forward_reforward(name, other_name,
                                   "Your board:\n" + show_board(other_name) + f"\n{name} missed. Your turn, attack(x,y).\
                                         \nType cancel to quit the game: ")
-    else:
-        if is_lose(name):  # they win
-            pass
+    else:  # they attack
         if msg[len(f"forward {name} from {other_name} "):] == QUIT:
             activity_list[BATTLESHIP] = 0
             flag.clear()
@@ -233,8 +238,16 @@ def attack_ship(connection, name, other_name, msg: str, is_encrypt, activity_lis
             client_list[name][2].battleship.score = -1
         else:
             word = msg.split()
-            if not client_list[name][2].battleship.board[word[0]][word[1]] == '.':  # they already shot
-                pass
+            if (client_list[other_name][2].battleship.board[word[0]][word[1]] == '.') \
+                    or (int(word[0]) < 1 or int(word[0]) > BOARD_SIZE - 1) \
+                    or (int(word[1]) < 1 or int(word[1]) > BOARD_SIZE - 1):
+                forward_reforward(name, other_name, "Invalid coordinates")
+                return
+            if is_lose(name):  # you win
+                client_list[other_name][2].game.append(
+                    (BATTLESHIP, name, client_list[other_name][2].battleship.score))
+                client_list[name][2].game.append((BATTLESHIP, other_name, client_list[name][2].battleship.score))
+
             if hit_or_miss(word[0], word[1], name):
                 send(connection, f"Hit. One ship down. {show_remaining_ship(name)}Attack (x,y):")
                 forward_no_reply(name, other_name, f"{other_name} shot your ship at ({word[0], word[1]} \

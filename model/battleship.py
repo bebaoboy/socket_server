@@ -6,3 +6,4 @@ class BattleShip:
         self.miss = []
         self.score = 0
         self.ship = []
+        self.num_of_ship = 0
