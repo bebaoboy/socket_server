@@ -100,9 +100,6 @@ def command(connection: socket, full_msg, addr, activity_list, flag: list, is_en
                     begin_chat(connection, name, msg, is_encrypt, activity_list, flag)
 
             elif flag[0][0] == "Battleship":
-
-                # if len(word) > 1:
-                #     msg = " ".join(word)
                 if activity_list["Battleship"] == 1:
                     word: list = full_msg.split()
                     msg = word[4]
@@ -115,6 +112,7 @@ def command(connection: socket, full_msg, addr, activity_list, flag: list, is_en
 
         except Exception as err:
             send(connection, f"{other_name} left abruptly", is_encrypt)
+            reply(name, other_name, f"reply {name} left abruptly")
             print(f"[{addr}]: {str(err)}")
             activity_list[flag[0][0]] = 0
             flag.clear()

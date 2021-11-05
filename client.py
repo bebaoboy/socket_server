@@ -43,14 +43,14 @@ def read(client: socket, is_encrypt: bool, prompt: list):
 
             elif msg[:8] == "forward ":
                 words: list = msg.split()
-                msg = " ".join(words)
+                # msg = " ".join(words)
                 send(client, msg, is_encrypt)
 
             elif msg[:9] == "no_reply ":
                 # print more name
                 # no_reply from sender to receiver
                 words: list = msg.split()
-                print(msg[len(f"no_reply from {words[2]} to {words[4]} ")])
+                print(msg[len(f"no_reply from {words[2]} to {words[4]} "):])
                 prompt.append("no_reply")
 
             elif msg[:6] == "reply ":
@@ -60,7 +60,7 @@ def read(client: socket, is_encrypt: bool, prompt: list):
             elif msg[:5] == "from ":
                 # from sender to receiver msg
                 words: list = msg.split()
-                print(" ".join(words[4:]))
+                print(msg[len(f"from {words[1]} to {words[3]} "):])
                 # pair (sender, receiver)
                 # print(words[1], " ", words[3])
                 if len(prompt) == 1:

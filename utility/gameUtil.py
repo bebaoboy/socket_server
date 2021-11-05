@@ -113,10 +113,11 @@ def upload_ship(connection, name, other_name, msg, is_encrypt, activity_list, fl
             send(connection, f"{other_name} quits the game", is_encrypt)
             send(client_list[other_name][0], "you quits the game", client_list[other_name][4])
         else:
+            activity_list[BATTLESHIP] = 2
             create_ship_list(other_name, ship_list)
             initial_board(other_name)
             b = show_board(other_name)
-            reply(name, name, f"Game begins. Your board:\n{b}\nYou go first!\n")
+            reply(name, name, f"reply Game begins. Your board:\n{b}\nYou go first!\n")
             send(connection, "Attack their ship (x,y). Type cancel to quit the game:", is_encrypt)
             forward_no_reply(
                 name, other_name, f"Game begins.\nYour board:\n"
@@ -195,7 +196,7 @@ def is_lose(name):
 
 
 def attack_ship(connection, name, other_name, msg: str, is_encrypt, activity_list, flag):
-    if msg[:8] != "forward ":  # you attack
+    if len(msg) >= 8 and msg[:8] != "forward ":  # you attack
         if msg == QUIT:
             activity_list[BATTLESHIP] = 0
             flag.clear()
