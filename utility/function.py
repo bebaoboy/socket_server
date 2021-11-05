@@ -77,7 +77,7 @@ def log_out(name):
     client_list[name][3] = 0
     send(client_list[name][0], "Log out successfully\n" +
          "Welcome to " + SERVER + "\n", client_list[name][4])
-
+       #
 
 # encryption supported
 # command option1 option2 option 3
